@@ -1,0 +1,100 @@
+/* ============================================================
+   TOKENS.CSS — Design Tokens
+   VitalCheck — BMI & Health Calculator
+
+   Deep blue/navy palette — trustworthy, clinical, modern.
+   Dark mode default with a clean light mode option.
+   Edit these variables to change the entire app's look.
+   ============================================================ */
+
+:root {
+  /* ── Dark Mode (default) ── */
+  --bg:              #0a0f1e;   /* Deep navy black */
+  --bg-card:         #101828;   /* Card surface */
+  --bg-alt:          #162033;   /* Input backgrounds */
+  --bg-elevated:     #1a2840;   /* Elevated panels */
+
+  --ink:             #e8f0fe;   /* Soft blue-white */
+  --ink-2:           #a8b8d8;   /* Secondary text */
+  --ink-3:           #5a7090;   /* Muted text */
+  --ink-4:           #2a3a55;   /* Very muted */
+
+  --border:          #1e2e45;
+  --border-strong:   #2a3e58;
+
+  /* ── Accent — Sky Blue ── */
+  --accent:          #4a9eff;   /* Primary blue */
+  --accent-2:        #2d7dd2;   /* Darker blue */
+  --accent-glow:     rgba(74, 158, 255, 0.12);
+  --accent-glow-strong: rgba(74, 158, 255, 0.2);
+
+  /* ── BMI Status Colors ── */
+  --status-under:    #74b3f7;   /* Underweight — light blue */
+  --status-normal:   #4ecb8d;   /* Normal — green */
+  --status-over:     #f4a261;   /* Overweight — orange */
+  --status-obese1:   #e07050;   /* Obese I — red-orange */
+  --status-obese2:   #c0392b;   /* Obese II — red */
+  --status-obese3:   #922b21;   /* Obese III — dark red */
+
+  --status-under-dim:  rgba(116, 179, 247, 0.12);
+  --status-normal-dim: rgba(78, 203, 141, 0.12);
+  --status-over-dim:   rgba(244, 162, 97, 0.12);
+  --status-obese-dim:  rgba(224, 112, 80, 0.12);
+
+  /* ── Typography ── */
+  --font-display:    'Plus Jakarta Sans', sans-serif;
+  --font-body:       'Plus Jakarta Sans', sans-serif;
+
+  /* ── Spacing ── */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ── Border Radius ── */
+  --radius-sm:   8px;
+  --radius-md:   14px;
+  --radius-lg:   20px;
+  --radius-xl:   28px;
+  --radius-full: 999px;
+
+  /* ── Shadows ── */
+  --shadow-sm:     0 1px 4px rgba(0,0,0,0.4);
+  --shadow-md:     0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg:     0 12px 40px rgba(0,0,0,0.6);
+  --shadow-accent: 0 4px 24px rgba(74, 158, 255, 0.2);
+
+  /* ── Transitions ── */
+  --transition:      0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Light Mode ── */
+[data-theme="light"] {
+  --bg:              #f0f4ff;
+  --bg-card:         #ffffff;
+  --bg-alt:          #e8eeff;
+  --bg-elevated:     #dde5ff;
+
+  --ink:             #0a1535;
+  --ink-2:           #2a3a6a;
+  --ink-3:           #5a6a9a;
+  --ink-4:           #a8b4d0;
+
+  --border:          #d0d8f0;
+  --border-strong:   #b8c4e8;
+
+  --accent-glow:        rgba(74, 158, 255, 0.08);
+  --accent-glow-strong: rgba(74, 158, 255, 0.15);
+
+  --shadow-sm:     0 1px 4px rgba(10,20,60,0.08);
+  --shadow-md:     0 4px 20px rgba(10,20,60,0.10);
+  --shadow-lg:     0 12px 40px rgba(10,20,60,0.12);
+  --shadow-accent: 0 4px 24px rgba(74, 158, 255, 0.15);
+}

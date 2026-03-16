@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>VitalCheck — BMI & Health Calculator</title>
+  <meta name="description" content="Calculate your BMI, see your health status, get personalized health tips, and track your progress over time." />
+  <meta name="author" content="David John Emmanuel G. Tulio" />
+
+  <!-- Open Graph -->
+  <meta property="og:title"       content="VitalCheck — BMI & Health Calculator" />
+  <meta property="og:description" content="Know your BMI. Understand your health. Take action." />
+  <meta property="og:type"        content="website" />
+
+  <!--
+  ═══════════════════════════════════════════════════════════════
+  VITALCHECK — BMI & Health Calculator
+  Built by David John Emmanuel G. Tulio
+
+  FILE STRUCTURE:
+    index.html                ← You are here (HTML only)
+    assets/
+      css/
+        tokens.css            ← Colors, fonts, spacing variables
+        base.css              ← Reset, buttons, form elements
+        layout.css            ← Header, hero, grid, input panel
+        results.css           ← Gauge, result cards, tips, history
+      js/
+        config.js             ← BMI ranges, tips, storage, math helpers
+        calculator.js         ← BMI calculation and result rendering
+        history.js            ← Save/load/render history
+        theme.js              ← Dark/light mode
+        app.js                ← UI interactions and app init
+
+  HOW TO CUSTOMIZE:
+    - BMI ranges      → assets/js/config.js (BMI_RANGES array)
+    - Health tips     → assets/js/config.js (HEALTH_TIPS object)
+    - Colors          → assets/css/tokens.css
+    - Add unit system → assets/js/config.js + assets/js/app.js
+  ═══════════════════════════════════════════════════════════════
+  -->
+
+  <!-- Theme pre-load -->
+  <script>
+    (function () {
+      var saved = localStorage.getItem('vc_theme');
+      var light = window.matchMedia('(prefers-color-scheme: light)').matches;
+      document.documentElement.setAttribute('data-theme', saved || (light ? 'light' : 'dark'));
+    })();
+  </script>
+
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="assets/css/tokens.css" />
+  <link rel="stylesheet" href="assets/css/base.css" />
+  <link rel="stylesheet" href="assets/css/layout.css" />
+  <link rel="stylesheet" href="assets/css/results.css" />
+
+  <!-- Toast style (inline since it's small) -->
+  <style>
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-strong);
+      color: var(--ink);
+      padding: 0.7rem 1.4rem;
+      border-radius: var(--radius-full);
+      font-size: 0.8rem;
+      font-weight: 500;
+      box-shadow: var(--shadow-lg);
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      z-index: 200;
+      white-space: nowrap;
+    }
+    .toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.warning { border-color: var(--status-over); }
+    .toast.danger  { border-color: var(--status-obese1); }
+  </style>
+</head>
+
+<body>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <!-- ════════════════════════════════════
+       MAIN APP
+  ════════════════════════════════════ -->
+  <div class="app">
+
+    <!-- ── HEADER ── -->
+    <header class="header">
+      <div class="header__brand">
+        <div class="header__logo-icon" aria-hidden="true">💙</div>
+        <div>
+          <div class="header__title">VitalCheck</div>
+          <div class="header__tagline">BMI &amp; Health Calculator</div>
+        </div>
+      </div>
+      <div class="header__controls">
+        <button class="icon-btn" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span id="themeIcon">☀</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <h1 class="hero__title">Know your <span>BMI.</span><br />Understand your health.</h1>
+      <p class="hero__sub">
+        Enter your details below to calculate your Body Mass Index,
+        see your health status, and get personalized tips.
+      </p>
+    </div>
+
+    <!-- ── MAIN GRID ── -->
+    <div class="main-grid">
+
+      <!-- ════════════ LEFT: INPUT PANEL ════════════ -->
+      <div class="input-panel">
+
+        <!-- Gender -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title">👤 Gender</span>
+          </div>
+          <div class="card__body">
+            <div class="gender-selector">
+              <button class="gender-btn active" data-gender="male" aria-pressed="true">
+                <span class="gender-btn__icon" aria-hidden="true">♂</span>
+                Male
+              </button>
+              <button class="gender-btn" data-gender="female" aria-pressed="false">
+                <span class="gender-btn__icon" aria-hidden="true">♀</span>
+                Female
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Age -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title">🎂 Age</span>
+          </div>
+          <div class="card__body">
+            <div class="age-display" id="ageDisplay" aria-live="polite">
+              25 <span>years old</span>
+            </div>
+            <input
+              type="range"
+              id="ageSlider"
+              min="5"
+              max="100"
+              value="25"
+              aria-label="Age slider"
+              aria-valuemin="5"
+              aria-valuemax="100"
+              aria-valuenow="25"
+            />
+            <div style="display:flex; justify-content:space-between; margin-top:0.4rem;">
+              <span style="font-size:0.65rem; color:var(--ink-4);">5</span>
+              <span style="font-size:0.65rem; color:var(--ink-4);">100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Weight -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title">⚖️ Weight</span>
+            <!-- Unit toggle: kg / lbs -->
+            <div class="unit-toggle" role="group" aria-label="Weight unit">
+              <button class="unit-btn active" data-unit-group="weight" data-unit="kg" aria-pressed="true">kg</button>
+              <button class="unit-btn"        data-unit-group="weight" data-unit="lbs" aria-pressed="false">lbs</button>
+            </div>
+          </div>
+          <div class="card__body">
+            <div class="form-group">
+              <label class="form-label" for="weightInput">Enter your weight</label>
+              <div class="input-with-unit">
+                <input
+                  type="number"
+                  id="weightInput"
+                  class="form-input"
+                  placeholder="e.g. 60"
+                  min="1"
+                  max="500"
+                  step="0.1"
+                  aria-label="Weight"
+                />
+                <span class="input-unit" id="weightUnit">kg</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Height -->
+        <div class="card">
+          <div class="card__header">
+            <span class="card__title">📏 Height</span>
+            <!-- Unit toggle: cm / ft -->
+            <div class="unit-toggle" role="group" aria-label="Height unit">
+              <button class="unit-btn active" data-unit-group="height" data-unit="cm" aria-pressed="true">cm</button>
+              <button class="unit-btn"        data-unit-group="height" data-unit="ft" aria-pressed="false">ft</button>
+            </div>
+          </div>
+          <div class="card__body">
+
+            <!-- cm input -->
+            <div id="heightCmWrap">
+              <div class="form-group">
+                <label class="form-label" for="heightInput">Enter your height</label>
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="heightInput"
+                    class="form-input"
+                    placeholder="e.g. 165"
+                    min="50"
+                    max="280"
+                    step="0.1"
+                    aria-label="Height in centimeters"
+                  />
+                  <span class="input-unit">cm</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- ft + inches input -->
+            <div id="heightFtWrap" style="display:none; grid-template-columns:1fr 1fr; gap:0.75rem;">
+              <div class="form-group">
+                <label class="form-label" for="heightFt">Feet</label>
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="heightFt"
+                    class="form-input"
+                    placeholder="e.g. 5"
+                    min="1"
+                    max="9"
+                    aria-label="Height feet"
+                  />
+                  <span class="input-unit">ft</span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="heightIn">Inches</label>
+                <div class="input-with-unit">
+                  <input
+                    type="number"
+                    id="heightIn"
+                    class="form-input"
+                    placeholder="e.g. 5"
+                    min="0"
+                    max="11"
+                    aria-label="Height inches"
+                  />
+                  <span class="input-unit">in</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Calculate Button -->
+        <button class="btn-primary calculate-btn" id="calculateBtn" aria-label="Calculate BMI">
+          Calculate BMI →
+        </button>
+
+        <!-- Disclaimer -->
+        <div style="padding: 0 0.25rem;">
+          <button
+            id="disclaimerToggle"
+            style="font-size:0.7rem; color:var(--ink-4); letter-spacing:0.04em; text-decoration:underline; background:none; border:none; cursor:pointer; padding:0;"
+          >▼ Show disclaimer</button>
+          <div id="disclaimerContent" style="display:none; margin-top:0.6rem; font-size:0.72rem; color:var(--ink-4); line-height:1.6; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+            BMI is a screening tool, not a diagnostic measure. It does not account for muscle mass,
+            bone density, or fat distribution. Results are for general reference only.
+            Always consult a qualified healthcare professional for medical advice.
+          </div>
+        </div>
+
+      </div><!-- /input-panel -->
+
+      <!-- ════════════ RIGHT: RESULTS PANEL ════════════ -->
+      <div class="results-panel" id="resultsPanel">
+
+        <!-- Empty state (shown before first calculation) -->
+        <div class="results-empty" id="resultsEmpty">
+          <div class="results-empty__icon" aria-hidden="true">💙</div>
+          <p class="results-empty__text">
+            Fill in your details on the left<br />and click <strong>Calculate BMI</strong> to see your results.
+          </p>
+        </div>
+
+        <!-- Results content (hidden until first calculation) -->
+        <div id="resultsContent" style="display:none; flex-direction:column; gap:1.25rem;">
+
+          <!-- BMI Result Card -->
+          <div class="bmi-result-card" id="bmiResultCard">
+            <div class="bmi-result-card__label">Your BMI</div>
+            <div class="bmi-result-card__number" id="bmiNumber" aria-live="polite">—</div>
+            <div class="bmi-status-badge" id="bmiStatus" role="status">—</div>
+
+            <!-- Gauge bar -->
+            <div class="bmi-gauge" aria-label="BMI scale gauge">
+              <div class="bmi-gauge__bar">
+                <div class="bmi-gauge__needle" id="bmiNeedle" aria-hidden="true"></div>
+              </div>
+              <div class="bmi-gauge__labels">
+                <span class="bmi-gauge__label">Underweight</span>
+                <span class="bmi-gauge__label">Normal</span>
+                <span class="bmi-gauge__label">Over</span>
+                <span class="bmi-gauge__label">Obese</span>
+              </div>
+            </div>
+
+            <!-- Quick stats -->
+            <div class="quick-stats" id="quickStats"></div>
+          </div>
+
+          <!-- Healthy Weight Range -->
+          <div class="healthy-range" id="healthyRange"></div>
+
+          <!-- Health Tips -->
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title">💡 Health Tips For You</span>
+            </div>
+            <div class="card__body">
+              <div class="tips-list" id="tipsList"></div>
+            </div>
+          </div>
+
+          <!-- BMI Categories Reference -->
+          <div class="card">
+            <div class="card__header">
+              <span class="card__title">📊 BMI Categories</span>
+            </div>
+            <div class="card__body" style="padding:0;">
+              <table class="bmi-table" aria-label="BMI classification table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>BMI Range</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="bmiTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Save to History Button -->
+          <button class="btn-ghost" id="saveHistoryBtn" style="width:100%;" aria-label="Save result to history">
+            💾 Save to History
+          </button>
+
+        </div><!-- /resultsContent -->
+
+      </div><!-- /results-panel -->
+
+    </div><!-- /main-grid -->
+
+    <!-- ════════════ HISTORY SECTION ════════════ -->
+    <section style="margin-top: 3rem;" aria-labelledby="historyHeading">
+      <div class="card">
+        <div class="card__header">
+          <span class="card__title" id="historyHeading">📈 Your BMI History</span>
+          <button class="btn-ghost" id="clearHistoryBtn" style="padding:0.4rem 0.9rem; font-size:0.72rem;">
+            Clear All
+          </button>
+        </div>
+        <div class="card__body" style="padding: 0.5rem 0;">
+          <div class="history-list" id="historyList" aria-label="BMI calculation history" role="list">
+            <div class="history-empty">No history yet. Calculate your BMI to start tracking.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /app -->
+
+  <!--
+  ════════════════════════════════════════════════════════════
+  SCRIPTS — Load order matters!
+
+  1. config.js      → BMI_RANGES, HEALTH_TIPS, helpers, math
+  2. calculator.js  → calculate(), renderResult() (uses config.js)
+  3. history.js     → saveToHistory(), renderHistory()
+  4. theme.js       → initTheme(), toggleTheme()
+  5. app.js         → UI events, initApp() — loaded last
+  ════════════════════════════════════════════════════════════
+  -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/calculator.js"></script>
+  <script src="assets/js/history.js"></script>
+  <script src="assets/js/theme.js"></script>
+  <script src="assets/js/app.js"></script>
+
+</body>
+</html>

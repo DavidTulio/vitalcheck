@@ -1,0 +1,348 @@
+/* ============================================================
+   RESULTS.CSS — BMI Gauge, Result Cards, Tips, History
+   VitalCheck — BMI & Health Calculator
+   ============================================================ */
+
+/* ── BMI Result Card ── */
+.bmi-result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Glow effect behind the number */
+.bmi-result-card::before {
+  content: '';
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, var(--result-glow, var(--accent-glow)) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.bmi-result-card__label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--space-3);
+}
+
+/* Big BMI number */
+.bmi-result-card__number {
+  font-size: clamp(4rem, 10vw, 5.5rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  line-height: 1;
+  color: var(--result-color, var(--accent));
+  margin-bottom: var(--space-3);
+  transition: color var(--transition-slow);
+}
+
+/* Status badge */
+.bmi-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 0.4rem 1.2rem;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--result-dim, var(--accent-glow));
+  color: var(--result-color, var(--accent));
+  border: 1px solid var(--result-color, var(--accent));
+  margin-bottom: var(--space-5);
+  transition: all var(--transition-slow);
+}
+
+/* ── BMI Gauge / Scale Bar ── */
+.bmi-gauge {
+  margin: var(--space-6) 0 var(--space-4);
+}
+
+.bmi-gauge__bar {
+  position: relative;
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    to right,
+    var(--status-under)  0%,
+    var(--status-under)  22%,
+    var(--status-normal) 22%,
+    var(--status-normal) 43%,
+    var(--status-over)   43%,
+    var(--status-over)   55%,
+    var(--status-obese1) 55%,
+    var(--status-obese1) 70%,
+    var(--status-obese2) 70%,
+    var(--status-obese2) 85%,
+    var(--status-obese3) 85%,
+    var(--status-obese3) 100%
+  );
+  overflow: visible;
+}
+
+/* Needle / marker on the gauge */
+.bmi-gauge__needle {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  border: 3px solid var(--result-color, var(--accent));
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  transition: left var(--transition-slow);
+  z-index: 2;
+}
+
+/* Scale labels */
+.bmi-gauge__labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-2);
+}
+
+.bmi-gauge__label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  color: var(--ink-4);
+  letter-spacing: 0.04em;
+}
+
+/* ── Quick Stats Row ── */
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.quick-stat {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  text-align: center;
+}
+
+.quick-stat__value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1;
+  margin-bottom: var(--space-1);
+}
+
+.quick-stat__label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+/* ── Healthy Weight Range Card ── */
+.healthy-range {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+}
+
+.healthy-range__title {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: var(--space-3);
+}
+
+.healthy-range__values {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.healthy-range__value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--status-normal);
+}
+
+.healthy-range__sep {
+  font-size: 0.8rem;
+  color: var(--ink-4);
+}
+
+.healthy-range__unit {
+  font-size: 0.75rem;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+
+.healthy-range__sub {
+  font-size: 0.72rem;
+  color: var(--ink-3);
+  margin-top: var(--space-2);
+}
+
+/* ── Health Tips ── */
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.tip-item {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: border-color var(--transition);
+}
+
+.tip-item:hover { border-color: var(--accent); }
+
+.tip-item__icon {
+  font-size: 1.2rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.tip-item__text {
+  font-size: 0.82rem;
+  color: var(--ink-2);
+  line-height: 1.55;
+}
+
+.tip-item__text strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* ── BMI Categories Reference Table ── */
+.bmi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.bmi-table th {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.bmi-table td {
+  font-size: 0.8rem;
+  color: var(--ink-2);
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+
+.bmi-table tr:last-child td { border-bottom: none; }
+
+.bmi-table tr.active-row td { background: var(--accent-glow); }
+
+.bmi-table__dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: var(--space-2);
+  vertical-align: middle;
+}
+
+/* ── History ── */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  max-height: 220px;
+  overflow-y: auto;
+  padding: var(--space-1) 0;
+}
+
+.history-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-alt);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  font-size: 0.8rem;
+  transition: border-color var(--transition);
+}
+
+.history-item:hover { border-color: var(--border-strong); }
+
+.history-item__bmi {
+  font-size: 1.1rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  min-width: 44px;
+}
+
+.history-item__info { flex: 1; }
+
+.history-item__status {
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.history-item__meta {
+  font-size: 0.65rem;
+  color: var(--ink-4);
+  margin-top: 0.1rem;
+}
+
+.history-item__del {
+  opacity: 0;
+  font-size: 0.7rem;
+  color: var(--ink-4);
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition);
+}
+
+.history-item:hover .history-item__del { opacity: 1; }
+.history-item__del:hover {
+  background: rgba(224, 92, 92, 0.15);
+  color: #e05c5c;
+}
+
+.history-empty {
+  text-align: center;
+  padding: var(--space-6);
+  font-size: 0.78rem;
+  color: var(--ink-4);
+  font-style: italic;
+}
