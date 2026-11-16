@@ -12,6 +12,10 @@
   <meta property="og:title"       content="VitalCheck — BMI & Health Calculator" />
   <meta property="og:description" content="Know your BMI. Understand your health. Take action." />
   <meta property="og:type"        content="website" />
+  <meta property="og:url"         content="https://bmi-vitalcheck.netlify.app/" />
+  <meta property="og:image"       content="https://bmi-vitalcheck.netlify.app/assets/og.jpg" />
+  <meta name="twitter:card"       content="summary_large_image" />
+  <link rel="canonical" href="https://bmi-vitalcheck.netlify.app/" />
 
   <!--
   ═══════════════════════════════════════════════════════════════
@@ -41,14 +45,16 @@
   ═══════════════════════════════════════════════════════════════
   -->
 
-  <!-- Theme pre-load -->
-  <script>
-    (function () {
-      var saved = localStorage.getItem('vc_theme');
-      var light = window.matchMedia('(prefers-color-scheme: light)').matches;
-      document.documentElement.setAttribute('data-theme', saved || (light ? 'light' : 'dark'));
-    })();
-  </script>
+  <!-- Theme pre-load: prevents a flash of the wrong theme -->
+  <script src="assets/js/theme-boot.js"></script>
+
+  <!-- Font: start downloading straight away -->
+  <link rel="preload" href="assets/fonts/plusjakartasans-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+  <!-- Icon and browser colour -->
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0a0f1e" media="(prefers-color-scheme: dark)" />
+  <meta name="theme-color" content="#f0f4ff" media="(prefers-color-scheme: light)" />
 
   <!-- Stylesheets -->
   <link rel="stylesheet" href="assets/css/tokens.css" />
@@ -56,31 +62,6 @@
   <link rel="stylesheet" href="assets/css/layout.css" />
   <link rel="stylesheet" href="assets/css/results.css" />
 
-  <!-- Toast style (inline since it's small) -->
-  <style>
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: var(--bg-elevated);
-      border: 1px solid var(--border-strong);
-      color: var(--ink);
-      padding: 0.7rem 1.4rem;
-      border-radius: var(--radius-full);
-      font-size: 0.8rem;
-      font-weight: 500;
-      box-shadow: var(--shadow-lg);
-      opacity: 0;
-      pointer-events: none;
-      transition: all 0.3s ease;
-      z-index: 200;
-      white-space: nowrap;
-    }
-    .toast.show    { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.warning { border-color: var(--status-over); }
-    .toast.danger  { border-color: var(--status-obese1); }
-  </style>
 </head>
 
 <body>
@@ -163,9 +144,9 @@
               aria-valuemax="100"
               aria-valuenow="25"
             />
-            <div style="display:flex; justify-content:space-between; margin-top:0.4rem;">
-              <span style="font-size:0.65rem; color:var(--ink-4);">5</span>
-              <span style="font-size:0.65rem; color:var(--ink-4);">100</span>
+            <div class="age-scale" aria-hidden="true">
+              <span>5</span>
+              <span>100</span>
             </div>
           </div>
         </div>
@@ -233,7 +214,7 @@
             </div>
 
             <!-- ft + inches input -->
-            <div id="heightFtWrap" style="display:none; grid-template-columns:1fr 1fr; gap:0.75rem;">
+            <div id="heightFtWrap" class="height-ft">
               <div class="form-group">
                 <label class="form-label" for="heightFt">Feet</label>
                 <div class="input-with-unit">
@@ -269,18 +250,25 @@
           </div>
         </div>
 
+        <!-- Which BMI categories to use -->
+        <div class="scale-row">
+          <span class="scale-row__label" id="scaleLabel">Categories</span>
+          <div class="unit-toggle" role="group" aria-labelledby="scaleLabel">
+            <button class="unit-btn active" data-scale="who" aria-pressed="true">WHO</button>
+            <button class="unit-btn" data-scale="asian" aria-pressed="false">Asian</button>
+          </div>
+        </div>
+        <p class="scale-hint" id="scaleHint">Standard WHO cut-offs. Choose <strong>Asian</strong> for the lower cut-offs recommended for Asian adults.</p>
+
         <!-- Calculate Button -->
         <button class="btn-primary calculate-btn" id="calculateBtn" aria-label="Calculate BMI">
           Calculate BMI →
         </button>
 
         <!-- Disclaimer -->
-        <div style="padding: 0 0.25rem;">
-          <button
-            id="disclaimerToggle"
-            style="font-size:0.7rem; color:var(--ink-4); letter-spacing:0.04em; text-decoration:underline; background:none; border:none; cursor:pointer; padding:0;"
-          >▼ Show disclaimer</button>
-          <div id="disclaimerContent" style="display:none; margin-top:0.6rem; font-size:0.72rem; color:var(--ink-4); line-height:1.6; border-left:2px solid var(--border-strong); padding-left:0.75rem;">
+        <div class="disclaimer">
+          <button id="disclaimerToggle" class="disclaimer__toggle" aria-expanded="false" aria-controls="disclaimerContent">▼ Show disclaimer</button>
+          <div id="disclaimerContent" class="disclaimer__content" hidden>
             BMI is a screening tool, not a diagnostic measure. It does not account for muscle mass,
             bone density, or fat distribution. Results are for general reference only.
             Always consult a qualified healthcare professional for medical advice.
@@ -296,12 +284,12 @@
         <div class="results-empty" id="resultsEmpty">
           <div class="results-empty__icon" aria-hidden="true">💙</div>
           <p class="results-empty__text">
-            Fill in your details on the left<br />and click <strong>Calculate BMI</strong> to see your results.
+            Fill in your details<br />and click <strong>Calculate BMI</strong> to see your results.
           </p>
         </div>
 
         <!-- Results content (hidden until first calculation) -->
-        <div id="resultsContent" style="display:none; flex-direction:column; gap:1.25rem;">
+        <div id="resultsContent" class="results-content">
 
           <!-- BMI Result Card -->
           <div class="bmi-result-card" id="bmiResultCard">
@@ -344,7 +332,7 @@
             <div class="card__header">
               <span class="card__title">📊 BMI Categories</span>
             </div>
-            <div class="card__body" style="padding:0;">
+            <div class="card__body card__body--flush">
               <table class="bmi-table" aria-label="BMI classification table">
                 <thead>
                   <tr>
@@ -359,7 +347,7 @@
           </div>
 
           <!-- Save to History Button -->
-          <button class="btn-ghost" id="saveHistoryBtn" style="width:100%;" aria-label="Save result to history">
+          <button class="btn-ghost btn-block" id="saveHistoryBtn">
             💾 Save to History
           </button>
 
@@ -370,17 +358,18 @@
     </div><!-- /main-grid -->
 
     <!-- ════════════ HISTORY SECTION ════════════ -->
-    <section style="margin-top: 3rem;" aria-labelledby="historyHeading">
+    <section class="history-section" aria-labelledby="historyHeading">
       <div class="card">
         <div class="card__header">
           <span class="card__title" id="historyHeading">📈 Your BMI History</span>
-          <button class="btn-ghost" id="clearHistoryBtn" style="padding:0.4rem 0.9rem; font-size:0.72rem;">
+          <button class="btn-ghost btn-ghost--small" id="clearHistoryBtn">
             Clear All
           </button>
         </div>
-        <div class="card__body" style="padding: 0.5rem 0;">
+        <div class="card__body card__body--list">
+          <div class="history-chart" id="historyChart" hidden></div>
           <div class="history-list" id="historyList" aria-label="BMI calculation history" role="list">
-            <div class="history-empty">No history yet. Calculate your BMI to start tracking.</div>
+            <div class="history-empty" role="listitem">No history yet. Calculate your BMI to start tracking.</div>
           </div>
         </div>
       </div>

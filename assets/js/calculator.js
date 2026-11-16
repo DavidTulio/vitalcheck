@@ -103,6 +103,12 @@ function renderResult(bmi, range, weightKg, heightCm, age, gender, healthy) {
   bmiStatusEl.style.borderColor = range.color;
   bmiStatusEl.style.background  = range.dim;
 
+  // Gauge colours follow the categories in use (WHO or Asian),
+  // placed with the same scale as the needle
+  const edge = v => (v <= 0 ? 0 : v >= 999 ? 100 : ((v - 10) / 35) * 100);
+  document.querySelector('.bmi-gauge__bar').style.background =
+    'linear-gradient(to right, ' + activeRanges().map(r => `${r.color} ${edge(r.min)}% ${edge(r.max)}%`).join(', ') + ')';
+
   // Gauge needle position
   const gaugePct = getBMIGaugePosition(bmi);
   bmiNeedleEl.style.left  = gaugePct + '%';
@@ -112,11 +118,11 @@ function renderResult(bmi, range, weightKg, heightCm, age, gender, healthy) {
   const heightM = heightCm / 100;
   quickStatsEl.innerHTML = `
     <div class="quick-stat">
-      <div class="quick-stat__value">${weightKg.toFixed(1)}<span style="font-size:0.6rem;font-weight:500;color:var(--ink-3)"> kg</span></div>
+      <div class="quick-stat__value">${weightKg.toFixed(1)}<span class="quick-stat__unit"> kg</span></div>
       <div class="quick-stat__label">Weight</div>
     </div>
     <div class="quick-stat">
-      <div class="quick-stat__value">${heightCm}<span style="font-size:0.6rem;font-weight:500;color:var(--ink-3)"> cm</span></div>
+      <div class="quick-stat__value">${heightCm}<span class="quick-stat__unit"> cm</span></div>
       <div class="quick-stat__label">Height</div>
     </div>
     <div class="quick-stat">
@@ -134,7 +140,7 @@ function renderResult(bmi, range, weightKg, heightCm, age, gender, healthy) {
       <span class="healthy-range__value">${healthy.max}</span>
       <span class="healthy-range__unit">kg</span>
     </div>
-    <div class="healthy-range__sub">Based on BMI 18.5–24.9 for ${heightCm} cm height</div>
+    <div class="healthy-range__sub">Based on BMI ${healthy.bmiMin}–${healthy.bmiMax} for ${heightCm} cm height</div>
   `;
 
   // Health tips
@@ -142,6 +148,12 @@ function renderResult(bmi, range, weightKg, heightCm, age, gender, healthy) {
 
   // BMI reference table
   renderBMITable(range.id);
+
+  // Phones: the result is below the form — bring it into view
+  if (window.matchMedia('(max-width: 860px)').matches) {
+    const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.getElementById('resultsPanel').scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+  }
 }
 
 /* ── Animated Number Counter ────────────────────────────── */
@@ -178,18 +190,21 @@ function renderTips(categoryId) {
 /* ── BMI Reference Table ────────────────────────────────── */
 function renderBMITable(activeCategoryId) {
   bmiTableBodyEl.innerHTML = '';
-  BMI_RANGES.forEach(range => {
+  activeRanges().forEach(range => {
     const tr = document.createElement('tr');
     if (range.id === activeCategoryId) tr.className = 'active-row';
-    const maxLabel = range.max >= 999 ? '40+' : '< ' + range.max;
+    const rangeLabel = range.min === 0 ? '< ' + range.max : range.max >= 999 ? range.min + '+' : range.min + ' – < ' + range.max;
     tr.innerHTML = `
       <td>
-        <span class="bmi-table__dot" style="background:${range.color}"></span>
+        <span class="bmi-table__dot"></span>
         ${range.label}
       </td>
-      <td>${range.min === 0 ? '< 18.5' : range.min + ' – ' + maxLabel}</td>
-      <td style="color:${range.color}; font-weight:600;">${range.id === activeCategoryId ? '← You' : ''}</td>
+      <td>${rangeLabel}</td>
+      <td class="bmi-table__you">${range.id === activeCategoryId ? '← You' : ''}</td>
     `;
+    // Colours are set through the style object (allowed by the security policy)
+    tr.querySelector('.bmi-table__dot').style.background = range.color;
+    tr.querySelector('.bmi-table__you').style.color = range.color;
     bmiTableBodyEl.appendChild(tr);
   });
 }

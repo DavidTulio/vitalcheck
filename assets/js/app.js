@@ -118,11 +118,42 @@ const disclaimerContent = document.getElementById('disclaimerContent');
 
 if (disclaimerBtn) {
   disclaimerBtn.addEventListener('click', () => {
-    const isOpen = disclaimerContent.style.display !== 'none';
-    disclaimerContent.style.display = isOpen ? 'none' : 'block';
-    disclaimerBtn.textContent       = isOpen ? '▼ Show disclaimer' : '▲ Hide disclaimer';
+    const open = disclaimerBtn.getAttribute('aria-expanded') !== 'true';
+    disclaimerContent.hidden = !open;
+    disclaimerBtn.setAttribute('aria-expanded', String(open));
+    disclaimerBtn.textContent = open ? '▲ Hide disclaimer' : '▼ Show disclaimer';
   });
 }
+
+/* ── Toggle buttons: tell screen readers which one is selected ── */
+document.querySelectorAll('.unit-toggle, .gender-selector').forEach(group => {
+  group.addEventListener('click', () => {
+    group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.classList.contains('active'))));
+  });
+});
+
+/* ── WHO / Asian categories ─────────────────────────────── */
+const scaleHintEl = document.getElementById('scaleHint');
+const SCALE_HINTS = {
+  who:   'Standard WHO cut-offs. Choose <strong>Asian</strong> for the lower cut-offs recommended for Asian adults.',
+  asian: 'Asian cut-offs (WHO Asia-Pacific): overweight from 23, obese from 25.'
+};
+function setScale(scale) {
+  bmiScale = scale;
+  try { localStorage.setItem('vc_scale', scale); } catch (e) { /* storage blocked */ }
+  document.querySelectorAll('[data-scale]').forEach(b => {
+    b.classList.toggle('active', b.dataset.scale === scale);
+    b.setAttribute('aria-pressed', String(b.dataset.scale === scale));
+  });
+  scaleHintEl.innerHTML = SCALE_HINTS[scale];
+  renderHistory();
+}
+document.querySelectorAll('[data-scale]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    setScale(btn.dataset.scale);
+    if (lastResult) calculate();   // update the shown result straight away
+  });
+});
 
 /* ── App Initialisation ─────────────────────────────────── */
 function initApp() {
@@ -138,6 +169,9 @@ function initApp() {
 
   // Hide ft/in fields by default
   if (heightFtWrap) heightFtWrap.style.display = 'none';
+
+  // WHO / Asian, as chosen last time
+  setScale(bmiScale);
 }
 
 initApp();

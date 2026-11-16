@@ -258,3 +258,36 @@ input[type="range"]::-webkit-slider-thumb:hover {
   .app { padding: 0 1rem 4rem; }
   .hero__title { font-size: 1.6rem; }
 }
+
+/* ── Bits that used to be inline styles ── */
+.age-scale { display: flex; justify-content: space-between; margin-top: 0.4rem; font-size: 0.75rem; color: var(--ink-3); }
+.height-ft { display: none; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.results-content { display: none; flex-direction: column; gap: 1.25rem; }
+.card__body--flush { padding: 0; }
+.card__body--list { padding: 0.5rem 0; }
+.history-section { margin-top: 3rem; }
+.disclaimer { padding: 0 0.25rem; }
+.disclaimer__toggle {
+  min-height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--ink-3);
+  text-decoration: underline;
+}
+.disclaimer__content {
+  margin-top: 0.6rem;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--border-strong);
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: var(--ink-3);
+}
+
+/* ── WHO / Asian categories switch ── */
+.scale-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0 0.25rem; }
+.scale-row__label { font-size: 0.78rem; font-weight: 600; color: var(--ink-2); }
+.scale-hint { margin: -0.4rem 0 0; padding: 0 0.25rem; font-size: 0.75rem; line-height: 1.5; color: var(--ink-3); }
