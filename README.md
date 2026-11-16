@@ -4,7 +4,7 @@ A modern BMI and health calculator with deep blue/navy design, animated gauge,
 personalized health tips, and history tracking.
 
 **Built by:** David John Emmanuel G. Tulio
-**Live Demo:** *(add Netlify URL here)*
+**Live Demo:** https://bmi-vitalcheck.netlify.app
 
 ---
 
@@ -27,10 +27,21 @@ tips based on your result, and tracks your history over time.
 - **Healthy Weight Range** — shows your ideal weight range for your height
 - **4 Personalized Health Tips** — different tips per BMI category
 - **BMI Reference Table** — shows all categories, highlights your current one
-- **History Tracking** — save up to 10 past results, delete individual entries
+- **History Tracking** — save up to 10 past results, delete individual entries, and see a **trend chart** against the healthy range
+- **WHO or Asian cut-offs** — one switch for the lower cut-offs recommended for Asian adults (WHO Asia-Pacific); the gauge, table, tips and healthy range all follow it
+- **Phones** — the page scrolls to your result after you calculate
 - **Dark / Light Mode** — dark navy by default, saves preference
 - **Fully Responsive** — works on mobile and desktop
 - **Medical Disclaimer** — collapsible disclaimer reminding users BMI is a screening tool
+
+---
+
+## 🔒 Security & speed
+
+- Strict security headers in `_headers` (read by Netlify): no inline scripts or styles, no outside requests, can’t be framed by other sites
+- Saved history is checked before it is shown, and everything shown is escaped
+- The font is served from `assets/fonts/` instead of Google Fonts
+- Lighthouse (phone): Performance 98 · Accessibility 100 · Best practices 100 · SEO 100
 
 ---
 

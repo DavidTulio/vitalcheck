@@ -16,7 +16,7 @@
 
   --ink:             #e8f0fe;   /* Soft blue-white */
   --ink-2:           #a8b8d8;   /* Secondary text */
-  --ink-3:           #5a7090;   /* Muted text */
+  --ink-3:           #7a90b0;   /* Muted text — 5:1 or more on every surface */
   --ink-4:           #2a3a55;   /* Very muted */
 
   --border:          #1e2e45;
@@ -25,6 +25,7 @@
   /* ── Accent — Sky Blue ── */
   --accent:          #4a9eff;   /* Primary blue */
   --accent-2:        #2d7dd2;   /* Darker blue */
+  --on-accent:       #0a0f1e;   /* Text on the accent (navy on light blue: 6.9:1) */
   --accent-glow:     rgba(74, 158, 255, 0.12);
   --accent-glow-strong: rgba(74, 158, 255, 0.2);
 
@@ -84,8 +85,13 @@
 
   --ink:             #0a1535;
   --ink-2:           #2a3a6a;
-  --ink-3:           #5a6a9a;
-  --ink-4:           #a8b4d0;
+  --ink-3:           #4c5b8a;
+  --ink-4:           #a8b4d0;   /* decorative only, never text */
+
+  /* Deeper blue in light mode: readable as text and behind white text */
+  --accent:          #175fbd;
+  --accent-2:        #124c99;
+  --on-accent:       #ffffff;
 
   --border:          #d0d8f0;
   --border-strong:   #b8c4e8;

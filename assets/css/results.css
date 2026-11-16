@@ -118,7 +118,7 @@
 .bmi-gauge__label {
   font-size: 0.58rem;
   font-weight: 600;
-  color: var(--ink-4);
+  color: var(--ink-3);
   letter-spacing: 0.04em;
 }
 
@@ -151,7 +151,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 
 /* ── Healthy Weight Range Card ── */
@@ -186,7 +186,7 @@
 
 .healthy-range__sep {
   font-size: 0.8rem;
-  color: var(--ink-4);
+  color: var(--ink-3);
 }
 
 .healthy-range__unit {
@@ -316,14 +316,14 @@
 
 .history-item__meta {
   font-size: 0.65rem;
-  color: var(--ink-4);
+  color: var(--ink-3);
   margin-top: 0.1rem;
 }
 
 .history-item__del {
   opacity: 0;
   font-size: 0.7rem;
-  color: var(--ink-4);
+  color: var(--ink-3);
   width: 22px;
   height: 22px;
   border-radius: var(--radius-full);
@@ -343,6 +343,25 @@
   text-align: center;
   padding: var(--space-6);
   font-size: 0.78rem;
-  color: var(--ink-4);
+  color: var(--ink-3);
   font-style: italic;
 }
+
+/* Unit text inside the quick stats (used to be an inline style) */
+.quick-stat__unit { font-size: 0.6rem; font-weight: 500; color: var(--ink-3); }
+.bmi-table__you { font-weight: 600; }
+
+/* History delete button: always visible on touch screens and when focused */
+.history-item__del:focus-visible { opacity: 1; }
+@media (hover: none) { .history-item__del { opacity: 1; } }
+
+/* ── History chart ── */
+.history-chart { padding: 0.5rem 1rem 1rem; }
+.history-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.history-chart__band { fill: var(--status-normal-dim); }
+.history-chart__band-label { fill: var(--status-normal); font-size: 10px; font-weight: 600; }
+.history-chart__line { fill: none; stroke: var(--accent); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.history-chart__dot { fill: var(--bg-card); stroke: var(--accent); stroke-width: 2.5; }
+.history-chart__value { fill: var(--ink); font-size: 11px; font-weight: 700; }
+.history-chart__date { fill: var(--ink-3); font-size: 10px; }
+.history-chart__axis { stroke: var(--border-strong); stroke-width: 1; }

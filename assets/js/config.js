@@ -138,13 +138,45 @@ function calculateBMI(weightKg, heightCm) {
   return Math.round((weightKg / (heightM * heightM)) * 10) / 10;
 }
 
+/* ── Asian cut-offs ─────────────────────────────────────────
+   WHO Asia-Pacific guidance (2000): risk starts at lower BMI for
+   Asian adults. Overweight from 23, obese from 25 (class I) and
+   30 (class II). Chosen with the WHO / Asian switch.
+   ---------------------------------------------------------- */
+const ASIAN_CUTOFFS = {
+  underweight: [0, 18.5],
+  normal:      [18.5, 23],
+  overweight:  [23, 25],
+  obese1:      [25, 30],
+  obese2:      [30, 999]
+};
+
+/** 'who' or 'asian' — remembered between visits */
+let bmiScale = (function () {
+  try { return localStorage.getItem('vc_scale') === 'asian' ? 'asian' : 'who'; } catch (e) { return 'who'; }
+})();
+
+/** The BMI categories in use right now (WHO or Asian cut-offs). */
+function activeRanges() {
+  if (bmiScale !== 'asian') return BMI_RANGES;
+  return BMI_RANGES
+    .filter(r => ASIAN_CUTOFFS[r.id])
+    .map(r => ({
+      ...r,
+      min:   ASIAN_CUTOFFS[r.id][0],
+      max:   ASIAN_CUTOFFS[r.id][1],
+      label: r.id === 'overweight' ? 'Overweight (at risk)' : r.label
+    }));
+}
+
 /**
  * Get the BMI range object for a given BMI value.
  * @param {number} bmi
  * @returns {object} BMI range object from BMI_RANGES
  */
 function getBMIRange(bmi) {
-  return BMI_RANGES.find(r => bmi >= r.min && bmi < r.max) || BMI_RANGES[BMI_RANGES.length - 1];
+  const ranges = activeRanges();
+  return ranges.find(r => bmi >= r.min && bmi < r.max) || ranges[ranges.length - 1];
 }
 
 /**
@@ -155,9 +187,13 @@ function getBMIRange(bmi) {
  */
 function getHealthyWeightRange(heightCm) {
   const h = heightCm / 100;
+  const normal = activeRanges().find(r => r.id === 'normal');
+  const top = Math.round((normal.max - 0.1) * 10) / 10;   // 24.9 (WHO) or 22.9 (Asian)
   return {
-    min: Math.round(18.5 * h * h * 10) / 10,
-    max: Math.round(24.9 * h * h * 10) / 10
+    min: Math.round(normal.min * h * h * 10) / 10,
+    max: Math.round(top * h * h * 10) / 10,
+    bmiMin: normal.min,
+    bmiMax: top
   };
 }
 
